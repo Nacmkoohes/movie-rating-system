@@ -12,7 +12,10 @@ class MovieRepository:
 
     @staticmethod
     def list_movies_with_avg_rating(db: Session, offset: int, limit: int):
-        # returns list of (Movie, avg_rating)
+        """
+        Returns: list of tuples -> (Movie, avg_rating)
+        avg_rating can be None if a movie has no ratings.
+        """
         return (
             db.query(Movie, func.avg(MovieRating.score).label("avg_rating"))
             .outerjoin(MovieRating, MovieRating.movie_id == Movie.id)
@@ -20,4 +23,17 @@ class MovieRepository:
             .offset(offset)
             .limit(limit)
             .all()
+        )
+
+    @staticmethod
+    def get_movie_with_avg_rating(db: Session, movie_id: int):
+        """
+        Returns: tuple -> (Movie, avg_rating) or None
+        """
+        return (
+            db.query(Movie, func.avg(MovieRating.score).label("avg_rating"))
+            .outerjoin(MovieRating, MovieRating.movie_id == Movie.id)
+            .filter(Movie.id == movie_id)
+            .group_by(Movie.id)
+            .first()
         )
