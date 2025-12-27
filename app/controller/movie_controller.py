@@ -36,3 +36,12 @@ def add_rating(movie_id: int, payload: RatingCreate, db: Session = Depends(get_d
 def create_movie(payload: MovieCreate, db: Session = Depends(get_db)):
     data = MovieService.create_movie(db=db, payload=payload)
     return {"status": "success", "data": data}
+
+@router.put("/{movie_id}", operation_id="update_movie")
+def update_movie(
+    movie_id: int,
+    payload: MovieCreate,
+    db: Session = Depends(get_db),
+):
+    data = MovieService.update_movie(db, movie_id, payload)
+    return {"status": "success", "data": data}
