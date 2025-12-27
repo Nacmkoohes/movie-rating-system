@@ -49,3 +49,11 @@ def update_movie(
 @router.delete("/{movie_id}", status_code=204, operation_id="delete_movie")
 def delete_movie(movie_id: int, db: Session = Depends(get_db)):
     MovieService.delete_movie(db, movie_id)
+
+@router.get(
+    "/{movie_id}/ratings",
+    operation_id="get_movie_rating"
+)
+def get_movie_rating(movie_id: int, db: Session = Depends(get_db)):
+    data = MovieService.get_movie_rating(db=db, movie_id=movie_id)
+    return {"status": "success", "data": data}
