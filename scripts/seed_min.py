@@ -7,7 +7,7 @@ from app.models.movie import Movie
 
 
 def seed(db: Session) -> None:
-    # جلوگیری از تکرار seed
+
     if db.query(Movie).count() > 0:
         print("Seed skipped: movies already exist.")
         return

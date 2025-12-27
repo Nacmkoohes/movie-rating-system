@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.repositories.movie_repository import MovieRepository
 
-
 class MovieService:
     @staticmethod
     def list_movies(db: Session, page: int, page_size: int) -> dict:
