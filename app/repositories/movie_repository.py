@@ -50,3 +50,7 @@ class MovieRepository:
     def get_genres_by_ids(db: Session, genre_ids: list[int]):
         return db.query(Genre).filter(Genre.id.in_(genre_ids)).all()
 
+    @staticmethod
+    def delete_movie(db: Session, movie: Movie):
+        db.delete(movie)
+        db.commit()
