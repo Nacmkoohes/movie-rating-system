@@ -24,3 +24,12 @@ class MovieListResponse(BaseModel):
     page_size: int
     total_items: int
     items: List[MovieOut]
+
+
+class MovieCreate(BaseModel):
+    title: str
+    director_id: int
+    release_year: int
+    cast: Optional[str] = None
+    genres: List[int]
+
