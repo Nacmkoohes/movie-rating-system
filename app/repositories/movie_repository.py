@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
+from app.models.genre import Genre
 from app.models.movie import Movie
 from app.models.movie_rating import MovieRating
 
@@ -37,3 +38,15 @@ class MovieRepository:
             .group_by(Movie.id)
             .first()
         )
+
+    @staticmethod
+    def create_movie(db: Session, movie: Movie):
+        db.add(movie)
+        db.commit()
+        db.refresh(movie)
+        return movie
+
+    @staticmethod
+    def get_genres_by_ids(db: Session, genre_ids: list[int]):
+        return db.query(Genre).filter(Genre.id.in_(genre_ids)).all()
+
