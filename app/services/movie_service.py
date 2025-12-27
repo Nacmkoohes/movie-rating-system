@@ -113,3 +113,19 @@ class MovieService:
             raise HTTPException(status_code=404, detail="Movie not found")
 
         MovieRepository.delete_movie(db, movie)
+
+
+    @staticmethod
+    def get_movie_rating(db: Session, movie_id: int):
+        result = MovieRepository.get_movie_rating_aggregate(db, movie_id)
+
+        if result is None:
+            raise HTTPException(status_code=404, detail="Movie not found")
+
+        avg_rating, ratings_count = result
+
+        return {
+            "movie_id": movie_id,
+            "average_rating": round(float(avg_rating), 2) if avg_rating is not None else None,
+            "ratings_count": ratings_count,
+        }
