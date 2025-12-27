@@ -2,6 +2,9 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.repositories.movie_repository import MovieRepository
+from app.schemas.movie import MovieCreate
+from app.models.movie import Movie
+
 
 class MovieService:
     @staticmethod
@@ -46,3 +49,35 @@ class MovieService:
             "genres": [g.name for g in movie.genres],
             "average_rating": round(float(avg_rating), 2) if avg_rating is not None else None,
         }
+
+
+    @staticmethod
+    def create_movie(db: Session, payload: MovieCreate):
+        genres = MovieRepository.get_genres_by_ids(db, payload.genres)
+        if len(genres) != len(payload.genres):
+            raise HTTPException(status_code=422, detail="Invalid genres")
+
+        movie = Movie(
+            title=payload.title,
+            director_id=payload.director_id,
+            release_year=payload.release_year,
+            cast=payload.cast,
+        )
+
+        movie.genres = genres
+        MovieRepository.create_movie(db, movie)
+
+        return {
+            "id": movie.id,
+            "title": movie.title,
+            "release_year": movie.release_year,
+            "director": {
+                "id": movie.director.id,
+                "name": movie.director.name,
+            },
+            "genres": [g.name for g in movie.genres],
+            "cast": movie.cast,
+            "average_rating": None,
+            "ratings_count": 0,
+        }
+
