@@ -54,3 +54,15 @@ class MovieRepository:
     def delete_movie(db: Session, movie: Movie):
         db.delete(movie)
         db.commit()
+
+
+    @staticmethod
+    def get_movie_rating_aggregate(db: Session, movie_id: int):
+        return (
+            db.query(
+                func.avg(MovieRating.score).label("average_rating"),
+                func.count(MovieRating.id).label("ratings_count"),
+            )
+            .filter(MovieRating.movie_id == movie_id)
+            .first()
+        )
