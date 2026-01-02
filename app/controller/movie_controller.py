@@ -7,6 +7,9 @@ from app.schemas.rating import RatingCreate
 from app.services.rating_service import RatingService
 from app.schemas.movie import MovieCreate
 
+import logging
+
+logger = logging.getLogger("movie_rating")
 
 router = APIRouter(prefix="/api/v1/movies", tags=["Movies"])
 
@@ -17,8 +20,16 @@ def list_movies(
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    data = MovieService.list_movies(db=db, page=page, page_size=page_size)
-    return {"status": "success", "data": data}
+    logger.info("Fetching movie list")
+
+    try:
+        data = MovieService.list_movies(db=db, page=page, limit=limit)
+        logger.info(f"Fetched {len(data['items'])} movies successfully")
+        return {"status": "success", "data": data}
+    except Exception:
+        logger.error("Failed to fetch movie list", exc_info=True)
+        raise
+
 
 
 @router.get("/{movie_id}", response_model=dict, operation_id="get_movie")
@@ -50,10 +61,38 @@ def update_movie(
 def delete_movie(movie_id: int, db: Session = Depends(get_db)):
     MovieService.delete_movie(db, movie_id)
 
-@router.get(
+
+@router.post(
     "/{movie_id}/ratings",
-    operation_id="get_movie_rating"
+    response_model=dict,
+    operation_id="add_movie_rating"
 )
-def get_movie_rating(movie_id: int, db: Session = Depends(get_db)):
-    data = MovieService.get_movie_rating(db=db, movie_id=movie_id)
-    return {"status": "success", "data": data}
+def add_rating(movie_id: int, payload: RatingCreate, db: Session = Depends(get_db)):
+
+    logger.info(
+        f"Add rating request (movie_id={movie_id}, score={payload.score}, route=/api/v1/movies/{movie_id}/ratings)"
+    )
+
+    if payload.score < 1 or payload.score > 10:
+        logger.warning(
+            f"Invalid rating score (movie_id={movie_id}, score={payload.score})"
+        )
+        raise HTTPException(status_code=400, detail="Invalid rating score")
+
+    try:
+        data = RatingService.add_rating(
+            db=db,
+            movie_id=movie_id,
+            score=payload.score
+        )
+        logger.info(
+            f"Rating added successfully (movie_id={movie_id}, score={payload.score})"
+        )
+        return {"status": "success", "data": data}
+
+    except Exception:
+        logger.error(
+            f"Failed to add rating (movie_id={movie_id}, score={payload.score})",
+            exc_info=True
+        )
+        raise
