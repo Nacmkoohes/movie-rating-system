@@ -5,6 +5,11 @@ from app.models.director import Director
 from app.models.genre import Genre
 from app.models.movie import Movie
 
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path().resolve().parent.parent))
+
 
 def seed(db: Session) -> None:
 
