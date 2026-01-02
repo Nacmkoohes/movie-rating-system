@@ -6,10 +6,18 @@ services:
       POSTGRES_USER: movie_user
       POSTGRES_PASSWORD: movie_pass
       POSTGRES_DB: movie_rating
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: movie_app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://movie_user:movie_pass@db:5432/movie_rating
 
 volumes:
   postgres_data:
