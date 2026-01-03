@@ -6,6 +6,7 @@ from app.services.movie_service import MovieService
 from app.schemas.rating import RatingCreate
 from app.services.rating_service import RatingService
 from app.schemas.movie import MovieCreate
+from fastapi  import HTTPException
 
 import logging
 
@@ -23,7 +24,7 @@ def list_movies(
     logger.info("Fetching movie list")
 
     try:
-        data = MovieService.list_movies(db=db, page=page, limit=limit)
+        data = MovieService.list_movies(db=db, page=page, page_size=page_size)
         logger.info(f"Fetched {len(data['items'])} movies successfully")
         return {"status": "success", "data": data}
     except Exception:
