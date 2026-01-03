@@ -97,3 +97,11 @@ def add_rating(movie_id: int, payload: RatingCreate, db: Session = Depends(get_d
             exc_info=True
         )
         raise
+
+@router.get(
+    "/{movie_id}/ratings",
+    operation_id="get_movie_rating"
+)
+def get_movie_rating(movie_id: int, db: Session = Depends(get_db)):
+    data = MovieService.get_movie_rating(db=db, movie_id=movie_id)
+    return {"status": "success", "data": data}
