@@ -1,4 +1,4 @@
-from sqlalchemy import text
+from sqlalchemy.orm import text
 from app.db.session import engine
 
 with engine.connect() as conn:

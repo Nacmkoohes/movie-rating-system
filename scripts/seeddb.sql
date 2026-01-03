@@ -44,12 +44,13 @@ CREATE TABLE tmdb_credits_raw (
 );
 
 -- Load CSVs (must run from this scripts directory)
-\copy tmdb_movies_raw
-(budget, genres, homepage, id, keywords, original_language, original_title, overview, popularity, production_companies, production_countries, release_date, revenue, runtime, spoken_languages, status, tagline, title, vote_average, vote_count)
-FROM 'tmdb_5000_movies.csv' CSV HEADER;
+-- Load CSVs (files are mounted into the db container at /scripts)
 
-\copy tmdb_credits_raw (movie_id, title, "cast", crew)
-FROM 'tmdb_5000_credits.csv' CSV HEADER;
+-- Load CSVs (files are mounted into the db container at /scripts)
+
+\copy tmdb_movies_raw (budget, genres, homepage, id, keywords, original_language, original_title, overview, popularity, production_companies, production_countries, release_date, revenue, runtime, spoken_languages, status, tagline, title, vote_average, vote_count) FROM '/scripts/tmdb_5000_movies_short.csv' CSV HEADER;
+
+\copy tmdb_credits_raw (movie_id, title, "cast", crew) FROM '/scripts/tmdb_5000_credits.csv' CSV HEADER;
 
 -- Insert genres
 -- Process genres from the JSON array in `genres` column
