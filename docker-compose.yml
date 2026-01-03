@@ -6,31 +6,18 @@ services:
       POSTGRES_USER: movie_user
       POSTGRES_PASSWORD: movie_pass
       POSTGRES_DB: movie_rating
-    ports:
-      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts:/scripts:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U movie_user -d movie_rating"]
-      interval: 5s
-      timeout: 3s
-      retries: 20
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: movie-rating-app
-    environment:
-      DATABASE_URL: postgresql+psycopg2://movie_user:movie_pass@db:5432/movie_rating
+    build: .
+    container_name: movie_app
     ports:
       - "8000:8000"
     depends_on:
-      db:
-        condition: service_healthy
-        
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+      - db
+    environment:
+      DATABASE_URL: postgresql://movie_user:movie_pass@db:5432/movie_rating
 
 volumes:
   postgres_data:
